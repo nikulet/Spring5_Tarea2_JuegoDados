@@ -2,6 +2,7 @@ package S05T2CebanNicusor.JuegoDados.controller;
 
 import S05T2CebanNicusor.JuegoDados.model.service.impl.GameServiceMongoDBImpl;
 import S05T2CebanNicusor.JuegoDados.model.dto.GameDTO;
+import S05T2CebanNicusor.JuegoDados.model.exception.PlayerNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class GameController {
     @PostMapping("/{id}/games")
     public ResponseEntity<GameDTO> addGame(@PathVariable int id) {
         if (!gameServiceMongoDBImpl.playerExists(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            throw new PlayerNotFoundException(id);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(gameServiceMongoDBImpl.addGame(id));
     }
@@ -32,7 +33,7 @@ public class GameController {
     @GetMapping("/{id}/games")
     public ResponseEntity<List<GameDTO>> getAllGames(@PathVariable int id) {
         if (!gameServiceMongoDBImpl.playerExists(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            throw new PlayerNotFoundException(id);
         }
         return ResponseEntity.ok(gameServiceMongoDBImpl.getAllGames(id, true));
     }
@@ -41,14 +42,12 @@ public class GameController {
     @DeleteMapping("/{id}/games")
     public ResponseEntity<String> deleteGames(@PathVariable int id) {
         if (!gameServiceMongoDBImpl.playerExists(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Player not found with ID: " + id);
+            throw new PlayerNotFoundException(id);
         }
-        List<GameDTO> games = gameServiceMongoDBImpl.getAllGames(id, false);
-        if (games.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No games found for player with ID: " + id);
-        } else {
-            gameServiceMongoDBImpl.deleteGames(id);
-            return ResponseEntity.ok("Games deleted successfully for player with ID: " + id);
-        }
+        List<GameDTO> games = gameServiceMongoDBImpl.getAllGames(id, true);
+
+        gameServiceMongoDBImpl.deleteGames(id);
+        return ResponseEntity.ok("Games deleted successfully for player with ID: " + id);
     }
+
 }
