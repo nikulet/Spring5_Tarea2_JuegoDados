@@ -5,10 +5,10 @@ import S05T2CebanNicusor.JuegoDados.model.domain.Game;
 import S05T2CebanNicusor.JuegoDados.model.exception.NoGamesFoundException;
 import S05T2CebanNicusor.JuegoDados.model.mapper.GameMapper;
 import S05T2CebanNicusor.JuegoDados.model.repository.mongodb.GameRepository;
+import S05T2CebanNicusor.JuegoDados.model.repository.mysql.PlayerRepository;
 import S05T2CebanNicusor.JuegoDados.model.service.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -18,7 +18,13 @@ import java.util.stream.Collectors;
 public class GameServiceMongoDBImpl implements GameService {
 
     private final GameRepository gameRepository;
+    private final PlayerRepository playerRepository; // Añadido para verificar la existencia del jugador
     private final GameMapper gameMapper;
+
+    // Nuevo método para verificar si el jugador existe
+    public boolean playerExists(int playerId) {
+        return playerRepository.existsById(playerId);
+    }
 
     @Override
     public GameDTO newGame(int playerId) {

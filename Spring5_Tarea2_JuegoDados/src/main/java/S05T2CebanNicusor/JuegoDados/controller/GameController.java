@@ -22,18 +22,27 @@ public class GameController {
     @Operation(summary = "Add new game by player ID")
     @PostMapping("/{id}/games")
     public ResponseEntity<GameDTO> addGame(@PathVariable int id) {
+        if (!gameServiceMongoDBImpl.playerExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(gameServiceMongoDBImpl.addGame(id));
     }
 
     @Operation(summary = "Get all games by player ID")
     @GetMapping("/{id}/games")
     public ResponseEntity<List<GameDTO>> getAllGames(@PathVariable int id) {
+        if (!gameServiceMongoDBImpl.playerExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
         return ResponseEntity.ok(gameServiceMongoDBImpl.getAllGames(id, true));
     }
 
     @Operation(summary = "Delete all games by player ID")
     @DeleteMapping("/{id}/games")
     public ResponseEntity<String> deleteGames(@PathVariable int id) {
+        if (!gameServiceMongoDBImpl.playerExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Player not found with ID: " + id);
+        }
         List<GameDTO> games = gameServiceMongoDBImpl.getAllGames(id, false);
         if (games.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No games found for player with ID: " + id);
@@ -42,5 +51,4 @@ public class GameController {
             return ResponseEntity.ok("Games deleted successfully for player with ID: " + id);
         }
     }
-
 }
