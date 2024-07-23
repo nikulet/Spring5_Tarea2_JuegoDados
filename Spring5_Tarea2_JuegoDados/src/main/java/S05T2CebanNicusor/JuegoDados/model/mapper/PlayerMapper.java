@@ -24,8 +24,6 @@ public class PlayerMapper {
                 .winRate(getPlayerWinRate(player.getPlayerId()))
                 .build();
 
-        dto.setWinRate(getPlayerWinRate(dto.getPlayerId()));
-
         return dto;
     }
 

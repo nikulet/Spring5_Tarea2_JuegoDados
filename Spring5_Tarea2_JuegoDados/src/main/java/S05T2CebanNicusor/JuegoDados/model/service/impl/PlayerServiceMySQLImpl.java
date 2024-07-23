@@ -33,13 +33,13 @@ public class PlayerServiceMySQLImpl implements PlayerService {
     @Override
     public String validatePlayerName(String playerName) {
         if (StringUtils.isBlank(playerName) || playerName.equalsIgnoreCase("UNKNOWN")) {
-            return "ANONIMOS";
+            return "ANONIMO";
         }
 
-        playerRepository.findPlayerByPlayerNameIgnoreCase(playerName)
-                .ifPresent(player -> {
-                    throw new PlayerAlreadyExistsException(playerName);
-                });
+        Optional<Player> existingPlayer = playerRepository.findPlayerByPlayerNameIgnoreCase(playerName);
+        if (existingPlayer.isPresent()) {
+            throw new PlayerAlreadyExistsException(playerName);
+        }
 
         return playerName;
     }
@@ -72,23 +72,24 @@ public class PlayerServiceMySQLImpl implements PlayerService {
 
     @Override
     public PlayerDTO updatePlayerName(int id, String newName) {
-        Optional<Player> optionalPlayer = getOptionalPlayer(id);
-        Player okPlayer = optionalPlayer.orElseThrow(() -> new PlayerNotFoundException(id));
+        Player player = getOptionalPlayer(id).orElseThrow(() -> new PlayerNotFoundException(id));
 
-        okPlayer.setPlayerName(validatePlayerName(newName));
+        String validatedName = validatePlayerName(newName);
+        player.setPlayerName(validatedName);
 
-        return playerMapper.convertToDTO(playerRepository.save(okPlayer));
+        Player updatedPlayer = playerRepository.save(player);
+
+        return playerMapper.convertToDTO(updatedPlayer);
     }
 
     @Override
-    public PlayerDTO deletePlayer(int id_player) {
-        Optional<Player> optionalPlayer = getOptionalPlayer(id_player);
-        Player okPlayer = optionalPlayer.orElseThrow(() -> new PlayerNotFoundException(id_player));
+    public PlayerDTO deletePlayer(int idPlayer) {
+        Player player = getOptionalPlayer(idPlayer).orElseThrow(() -> new PlayerNotFoundException(idPlayer));
 
-        gameRepository.deleteAllByPlayerId(id_player);
-        playerRepository.deleteById(id_player);
+        gameRepository.deleteAllByPlayerId(idPlayer);
+        playerRepository.deleteById(idPlayer);
 
-        return playerMapper.convertToDTO(okPlayer);
+        return playerMapper.convertToDTO(player);
     }
 
     @Override
@@ -126,12 +127,9 @@ public class PlayerServiceMySQLImpl implements PlayerService {
 
     @Override
     public UserDetailsService userDetailsService() {
-        return new UserDetailsService() {
-            @Override
-            public UserDetails loadUserByUsername(String playerName) {
-                return playerRepository.findPlayerByPlayerNameIgnoreCase(playerName)
-                        .orElseThrow(() -> new UsernameNotFoundException("Player not found with name: " + playerName));
-            }
+        return username -> {
+            Optional<Player> player = playerRepository.findById(Integer.parseInt(username));
+            return player.orElseThrow(() -> new UsernameNotFoundException("Player not found with ID: " + username));
         };
     }
 }

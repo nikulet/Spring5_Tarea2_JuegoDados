@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 
 @Component
@@ -34,16 +35,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
-        String playerName = null;
+        Integer playerId = null;
         String jwt = null;
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
-            playerName = jwtService.extractPlayerName(jwt);
+            playerId = jwtService.extractPlayerId(jwt);
         }
 
-        if (playerName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = playerService.userDetailsService().loadUserByUsername(playerName);
+        if (playerId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = playerService.userDetailsService().loadUserByUsername(String.valueOf(playerId));
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());

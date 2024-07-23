@@ -9,6 +9,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// DTO para la solicitud de actualización del nombre del jugador
+class UpdatePlayerNameRequest {
+    private String playerName;
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+}
+
 @RestController
 @RequestMapping("/players")
 public class PlayerController {
@@ -18,11 +31,12 @@ public class PlayerController {
 
     @Operation(summary = "Update player name")
     @PutMapping("/update-name/{id}")
-    public ResponseEntity<PlayerDTO> updatePlayerName(@PathVariable int id, @RequestBody String player_name) {
-        if (player_name == null || player_name.trim().isEmpty()) {
-            player_name = "ANONIMOS";
+    public ResponseEntity<PlayerDTO> updatePlayerName(@PathVariable int id, @RequestBody UpdatePlayerNameRequest request) {
+        String playerName = request.getPlayerName();
+        if (playerName == null || playerName.trim().isEmpty()) {
+            playerName = "ANONIMO";
         }
-        return ResponseEntity.ok(playerServiceMySQLImpl.updatePlayerName(id, player_name));
+        return ResponseEntity.ok(playerServiceMySQLImpl.updatePlayerName(id, playerName));
     }
 
     @Operation(summary = "Get player details by ID")
