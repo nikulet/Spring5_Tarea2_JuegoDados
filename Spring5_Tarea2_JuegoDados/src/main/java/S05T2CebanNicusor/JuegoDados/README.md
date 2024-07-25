@@ -2,8 +2,12 @@
 ## Proyecto final: Juego de dados
 
 ********************************************************************************************
+Este es tu proyecto final, una API 100% diseñada por ti donde aplicarás todo lo que has aprendido
+hasta ahora para crear una aplicación completa, desde la base de datos hasta la seguridad. Aplica
+todo lo que sabes e incluso lo que no se pide.
+********************************************************************************************
 
-El juego de dados se juega con dos dados. Si el resultado de la suma de los dos dados es 7, la partida se gana, si no, se pierde. Un jugador puede ver un listado de todas las tiradas que ha hecho y el porcentaje de éxito.
+Al juego de dados se juega con dos dados. Si el resultado de la suma de los dos dados es 7, la partida se gana, si no, se pierde. Un jugador puede ver un listado de todas las tiradas que ha hecho y el porcentaje de éxito.
 Para poder jugar al juego y realizar una tirada, un usuario debe registrarse con un nombre no repetido. Al crearse, se le asigna un identificador númerico único y una fecha de registro. Si el usuario lo desea, puede no añadir ningún nombre y se llamará "ANÓNIMO". Puede haber más de un jugador "ANÓNIMO".
 
 Cada jugador puede ver un listado de todas las tiradas que ha hecho, con el valor de cada dado y si ha ganado o no la partida. Además, puede ver su porcentaje de éxito por todas las tiradas que ha hecho.
